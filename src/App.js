@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // ============================================================
 // CONFIGURATION — paste your Supabase credentials here
@@ -108,6 +108,24 @@ const INTAKE_QUESTIONS = [
         placeholder: "Cot, bassinet, your bed...",
       },
       {
+        id: "q_sleep_environment",
+        label: "Describe the child's environment where they sleep?",
+        type: "textarea",
+        placeholder: "e.g. Light, noise, approximate temperature",
+      },
+      {
+        id: "q_bedtime_person",
+        label: "Who usually puts the child to bed?",
+        type: "textarea",
+        placeholder: "",
+      },
+      {
+        id: "q_life_events",
+        label: "Are there any significant events in life that would impact the sleep?",
+        type: "textarea",
+        placeholder: "e.g. New sibling, house move, illness, travel...",
+      },
+      {
         id: "q_sleep_associations",
         label: "How does your child fall asleep?",
         type: "textarea",
@@ -176,12 +194,6 @@ const INTAKE_QUESTIONS = [
         label: "What have you already tried?",
         type: "textarea",
         placeholder: "",
-      },
-      {
-        id: "q_approach",
-        label: "How do you feel about the approach to sleep training?",
-        type: "textarea",
-        placeholder: "Any methods you'd prefer to avoid?",
       },
       {
         id: "q_other",

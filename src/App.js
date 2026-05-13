@@ -481,10 +481,7 @@ function ClientLogin({ onLogin }) {
   return (
     <div style={S.app}>
       <div style={S.loginBox}>
-        <div style={{ fontSize: "32px", marginBottom: "8px" }}>🌙</div>
-        <h1 style={{ fontSize: "22px", fontWeight: "400", marginBottom: "8px" }}>
-          Sleep Diary
-        </h1>
+        <h1 style={{ fontSize: "22px", fontWeight: "400", marginBottom: "8px" }}>Rested Rascals</h1>
         <p style={{ color: "#9a9590", fontSize: "14px", marginBottom: "28px" }}>
           Enter the code your consultant gave you
         </p>
@@ -663,9 +660,11 @@ function ClientApp({ client, onLogout }) {
   return (
     <div style={S.app}>
       <div style={S.header}>
-        <div>
-          <p style={{ ...S.headerTitle, fontSize: "16px" }}>🌙 Sleep Diary</p>
-          <p style={{ margin: 0, fontSize: "13px", opacity: 0.6 }}>{client.child_name || client.name}</p>
+        <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
+          <div>
+            <p style={{ ...S.headerTitle, fontSize: "16px" }}>Rested Rascals</p>
+            <p style={{ margin: 0, fontSize: "13px", opacity: 0.6 }}>{client.child_name || client.name}</p>
+          </div>
         </div>
         <button style={{ ...S.btnOutline, color: "#f8f5f0", borderColor: "#f8f5f0" }} onClick={onLogout}>
           Log out
@@ -954,11 +953,13 @@ function CoachApp({ onLogout }) {
     <div style={S.app}>
       <div style={S.header}>
         <div>
-          <p style={{ ...S.headerTitle, fontSize: "16px" }}>
-            {view === "client" && selectedClient
-              ? `← ${selectedClient.name}`
-              : "Sleep Consultant"}
-          </p>
+          <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
+            <p style={{ ...S.headerTitle, fontSize: "16px" }}>
+              {view === "client" && selectedClient
+                ? `← ${selectedClient.name}`
+                : "Rested Rascals"}
+            </p>
+          </div>
           {view === "client" && <p style={{ margin: 0, fontSize: "12px", opacity: 0.5 }}>Coach dashboard</p>}
         </div>
         <div style={S.row}>
@@ -1585,7 +1586,7 @@ export default function App() {
       return (
         <div style={S.app}>
           <div style={S.header}>
-            <p style={S.headerTitle}>Sleep Consultant</p>
+            <p style={S.headerTitle}>Rested Rascals</p>
             <button style={{ ...S.btnOutline, color: "#f8f5f0", borderColor: "#f8f5f0" }} onClick={() => setMode("choose")}>Back</button>
           </div>
           <CoachLogin onLogin={() => { sessionStorage.setItem("coach_authed", "1"); setCoachAuthed(true); }} />
@@ -1599,7 +1600,7 @@ export default function App() {
   return (
     <div style={S.app}>
       <div style={{ ...S.header, justifyContent: "center" }}>
-        <p style={S.headerTitle}>🌙 Sleep Practice</p>
+        <p style={S.headerTitle}>Rested Rascals</p>
       </div>
       <div style={{ maxWidth: "400px", margin: "80px auto", padding: "0 16px" }}>
         <div style={{ ...S.card, textAlign: "center" }}>

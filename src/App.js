@@ -310,12 +310,12 @@ const S = {
     letterSpacing: "0.08em",
     textTransform: "uppercase",
   },
-  container: { maxWidth: "900px", margin: "0 auto", padding: "24px 16px" },
+  container: { maxWidth: "900px", margin: "0 auto", padding: "16px 12px" },
   card: {
     background: "#fff",
     borderRadius: "12px",
     border: "1px solid #e8e3dc",
-    padding: "24px",
+    padding: "20px 16px",
     marginBottom: "16px",
   },
   btn: {
@@ -675,7 +675,7 @@ function ClientApp({ client, onLogout }) {
         {/* Tabs */}
         <div style={{ display: "flex", gap: "8px", marginBottom: "20px", background: "#fff", padding: "6px", borderRadius: "10px", border: "1px solid #e8e3dc" }}>
           {[["diary", "Sleep Diary"], ["intake", "Questionnaire"]].map(([id, label]) => (
-            <button key={id} style={{ ...S.tab(tab === id), flex: 1 }} onClick={() => setTab(id)}>
+            <button key={id} style={{ ...S.tab(tab === id), flex: 1, fontSize: "13px", padding: "10px 8px" }} onClick={() => setTab(id)}>
               {label}
             </button>
           ))}
@@ -870,11 +870,6 @@ function ClientApp({ client, onLogout }) {
 
         {tab === "intake" && (
           <div>
-            {intakeSaved && (
-              <div style={{ ...S.badge("green"), marginBottom: "16px", display: "block", padding: "10px 16px" }}>
-                ✓ Questionnaire submitted — thank you!
-              </div>
-            )}
             {INTAKE_QUESTIONS.map((section) => (
               <div key={section.section} style={S.card}>
                 <p style={S.sectionTitle}>{section.section}</p>
@@ -900,9 +895,27 @@ function ClientApp({ client, onLogout }) {
                 ))}
               </div>
             ))}
-            <button style={{ ...S.btn, width: "100%", padding: "14px" }} onClick={saveIntake} disabled={saving}>
+            <button
+              style={{ ...S.btn, width: "100%", padding: "16px", fontSize: "15px", marginBottom: "12px" }}
+              onClick={saveIntake}
+              disabled={saving}
+            >
               {saving ? "Saving..." : "Submit Questionnaire"}
             </button>
+            {intakeSaved && (
+              <div style={{
+                background: "#e8f5e9",
+                border: "1px solid #a5d6a7",
+                borderRadius: "12px",
+                padding: "16px 20px",
+                textAlign: "center",
+                color: "#2e7d32",
+                fontSize: "15px",
+                marginBottom: "24px",
+              }}>
+                ✓ Questionnaire submitted — thank you! Your consultant will be in touch soon.
+              </div>
+            )}
           </div>
         )}
       </div>

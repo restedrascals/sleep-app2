@@ -424,8 +424,10 @@ const S = {
   }),
   grid2: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
     gap: "12px",
+    width: "100%",
+    boxSizing: "border-box",
   },
   row: { display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" },
   statCard: {

@@ -314,7 +314,7 @@ const S = {
     letterSpacing: "0.08em",
     textTransform: "uppercase",
   },
-  container: { maxWidth: "100%", width: "100%", margin: "0 auto", padding: "16px 12px", boxSizing: "border-box", overflowX: "hidden" },
+  container: { maxWidth: "100%", width: "100%", margin: "0 auto", padding: "16px 14px", boxSizing: "border-box", overflowX: "hidden" },
   card: {
     background: "#fff",
     borderRadius: "12px",
@@ -323,6 +323,7 @@ const S = {
     marginBottom: "16px",
     boxSizing: "border-box",
     width: "100%",
+    maxWidth: "100%",
     overflow: "hidden",
   },
   btn: {

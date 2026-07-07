@@ -294,6 +294,10 @@ const S = {
     background: "#f8f5f0",
     fontFamily: "'Georgia', serif",
     color: "#2d2a26",
+    overflowX: "hidden",
+    width: "100%",
+    maxWidth: "100vw",
+    position: "relative",
   },
   header: {
     background: "#2d2a26",
@@ -310,13 +314,16 @@ const S = {
     letterSpacing: "0.08em",
     textTransform: "uppercase",
   },
-  container: { maxWidth: "900px", margin: "0 auto", padding: "16px 12px" },
+  container: { maxWidth: "100%", width: "100%", margin: "0 auto", padding: "16px 12px", boxSizing: "border-box", overflowX: "hidden" },
   card: {
     background: "#fff",
     borderRadius: "12px",
     border: "1px solid #e8e3dc",
     padding: "20px 16px",
     marginBottom: "16px",
+    boxSizing: "border-box",
+    width: "100%",
+    overflow: "hidden",
   },
   btn: {
     background: "#2d2a26",

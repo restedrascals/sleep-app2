@@ -756,21 +756,21 @@ function ClientApp({ client, onLogout }) {
             {/* Wake & Bed */}
             <div style={S.card}>
               <p style={S.sectionTitle}>Times</p>
-              <div style={S.grid2}>
-                <div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
+                <div style={{ width: "100%" }}>
                   <label style={S.label}>Morning wake time</label>
                   <input
                     type="time"
-                    style={S.input}
+                    style={{ ...S.input, width: "100%", boxSizing: "border-box" }}
                     value={log.wake_time || ""}
                     onChange={(e) => updateLog(selectedDate, "wake_time", e.target.value)}
                   />
                 </div>
-                <div>
+                <div style={{ width: "100%" }}>
                   <label style={S.label}>Bedtime</label>
                   <input
                     type="time"
-                    style={S.input}
+                    style={{ ...S.input, width: "100%", boxSizing: "border-box" }}
                     value={log.bedtime || ""}
                     onChange={(e) => updateLog(selectedDate, "bedtime", e.target.value)}
                   />

@@ -247,11 +247,11 @@ function calcTotalSleep(log, prevLog) {
     if (d) total += d;
   });
   // Overnight sleep = previous night's bedtime -> this morning's wake time.
-  // Falls back to same-day bedtime if no previous-day entry exists (e.g. first logged day).
-  const bedtimeForNight = prevLog?.bedtime || log.bedtime;
-  if (log.wake_time && bedtimeForNight) {
+  // If the previous day hasn't been logged, we don't know the overnight total yet —
+  // don't fall back to this date's own bedtime, since that pairs with the wrong night.
+  if (log.wake_time && prevLog?.bedtime) {
     const w = timeToMinutes(log.wake_time);
-    const b = timeToMinutes(bedtimeForNight);
+    const b = timeToMinutes(prevLog.bedtime);
     let night = w - b;
     if (night < 0) night += 1440;
     total += night;
@@ -757,7 +757,9 @@ function ClientApp({ client, onLogout }) {
             <div style={{ ...S.grid2, marginBottom: "16px" }}>
               <div style={S.statCard}>
                 <p style={S.statVal}>{minutesToDuration(totalSleep)}</p>
-                <p style={S.statLabel}>Total sleep (24h)</p>
+                <p style={S.statLabel}>
+                  {prevLog.bedtime ? "Total sleep (24h)" : "Naps only — last night not logged"}
+                </p>
               </div>
               <div style={S.statCard}>
                 <p style={S.statVal}>{(log.naps || []).length}</p>
@@ -778,6 +780,15 @@ function ClientApp({ client, onLogout }) {
               <p style={S.sectionTitle}>Times</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
                 <div style={{ width: "100%" }}>
+                  <label style={S.label}>Bedtime <span style={{ color: "#c0b8b0" }}>— last night</span></label>
+                  <input
+                    type="time"
+                    style={{ ...S.input, width: "100%", boxSizing: "border-box" }}
+                    value={prevLog.bedtime || ""}
+                    onChange={(e) => updateLog(prevDateStr(selectedDate), "bedtime", e.target.value)}
+                  />
+                </div>
+                <div style={{ width: "100%" }}>
                   <label style={S.label}>Wake time <span style={{ color: "#c0b8b0" }}>— this morning</span></label>
                   <input
                     type="time"
@@ -786,18 +797,9 @@ function ClientApp({ client, onLogout }) {
                     onChange={(e) => updateLog(selectedDate, "wake_time", e.target.value)}
                   />
                 </div>
-                <div style={{ width: "100%" }}>
-                  <label style={S.label}>Bedtime <span style={{ color: "#c0b8b0" }}>— tonight</span></label>
-                  <input
-                    type="time"
-                    style={{ ...S.input, width: "100%", boxSizing: "border-box" }}
-                    value={log.bedtime || ""}
-                    onChange={(e) => updateLog(selectedDate, "bedtime", e.target.value)}
-                  />
-                </div>
               </div>
               <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#a09890" }}>
-                "Total sleep" below uses last night's bedtime ({formatDate(prevDateStr(selectedDate))}) together with the wake time above.
+                Together these make up last night's sleep: bedtime on {formatDate(prevDateStr(selectedDate))} through to waking up this morning.
               </p>
             </div>
 
@@ -1399,13 +1401,15 @@ function ClientDetail({ client, tab, setTab, onReload, settings }) {
             <p style={S.sectionTitle}>Recent sleep</p>
             {visibleLogs.slice(0, 3).length === 0 && <p style={{ color: "#a09890", fontSize: "14px" }}>No diary entries yet.</p>}
             {visibleLogs.slice(0, 3).map((log) => {
-              const total = calcTotalSleep(log, getPrevLog(log.log_date));
+              const prevLog = getPrevLog(log.log_date);
+              const total = calcTotalSleep(log, prevLog);
+              const hasFullNight = !!prevLog?.bedtime;
               return (
                 <div key={log.id} style={{ marginBottom: "12px", paddingBottom: "12px", borderBottom: "1px solid #f0ede7" }}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ fontWeight: "500", fontSize: "14px" }}>{formatDate(log.log_date)}</span>
-                    <span style={S.badge(total > 840 ? "green" : total > 600 ? "amber" : "red")}>
-                      {minutesToDuration(total)} total
+                    <span style={S.badge(!hasFullNight ? "" : total > 840 ? "green" : total > 600 ? "amber" : "red")}>
+                      {hasFullNight ? `${minutesToDuration(total)} total` : "Last night not logged"}
                     </span>
                   </div>
                   <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#9a9590" }}>
@@ -1424,13 +1428,15 @@ function ClientDetail({ client, tab, setTab, onReload, settings }) {
           <p style={S.sectionTitle}>Sleep diary — last 14 entries</p>
           {visibleLogs.length === 0 && <p style={{ color: "#a09890", fontSize: "14px" }}>No diary entries yet.</p>}
           {visibleLogs.map((log) => {
-            const total = calcTotalSleep(log, getPrevLog(log.log_date));
+            const prevLogForRow = getPrevLog(log.log_date);
+            const total = calcTotalSleep(log, prevLogForRow);
+            const hasFullNight = !!prevLogForRow?.bedtime;
             return (
               <div key={log.id} style={{ marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid #f0ede7" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
                   <span style={{ fontWeight: "500" }}>{formatDate(log.log_date)}</span>
-                  <span style={S.badge(total > 840 ? "green" : total > 600 ? "amber" : "red")}>
-                    {minutesToDuration(total)}
+                  <span style={S.badge(!hasFullNight ? "" : total > 840 ? "green" : total > 600 ? "amber" : "red")}>
+                    {hasFullNight ? minutesToDuration(total) : "Last night not logged"}
                   </span>
                 </div>
                 <div style={{ ...S.grid2, fontSize: "13px" }}>

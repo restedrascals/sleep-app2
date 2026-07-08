@@ -769,7 +769,7 @@ function ClientApp({ client, onLogout }) {
               <p style={S.sectionTitle}>Times</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
                 <div style={{ width: "100%" }}>
-                  <label style={S.label}>Morning wake time</label>
+                  <label style={S.label}>Wake time <span style={{ color: "#c0b8b0" }}>— this morning</span></label>
                   <input
                     type="time"
                     style={{ ...S.input, width: "100%", boxSizing: "border-box" }}
@@ -778,7 +778,7 @@ function ClientApp({ client, onLogout }) {
                   />
                 </div>
                 <div style={{ width: "100%" }}>
-                  <label style={S.label}>Bedtime</label>
+                  <label style={S.label}>Bedtime <span style={{ color: "#c0b8b0" }}>— tonight</span></label>
                   <input
                     type="time"
                     style={{ ...S.input, width: "100%", boxSizing: "border-box" }}
@@ -788,7 +788,7 @@ function ClientApp({ client, onLogout }) {
                 </div>
               </div>
               <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#a09890" }}>
-                "Bedtime" here is the bedtime on the night of {formatDate(selectedDate)}, going into the next morning. Today's "Total sleep" uses last night's bedtime (from {formatDate(prevDateStr(selectedDate))}) together with today's wake time above.
+                "Total sleep" below uses last night's bedtime ({formatDate(prevDateStr(selectedDate))}) together with the wake time above.
               </p>
             </div>
 

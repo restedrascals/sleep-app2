@@ -240,15 +240,18 @@ function calcWakeWindow(t1, t2) {
   return diff;
 }
 
-function calcTotalSleep(log) {
+function calcTotalSleep(log, prevLog) {
   let total = 0;
   (log.naps || []).forEach((n) => {
     const d = calcNapDuration(n);
     if (d) total += d;
   });
-  if (log.wake_time && log.bedtime) {
+  // Overnight sleep = previous night's bedtime -> this morning's wake time.
+  // Falls back to same-day bedtime if no previous-day entry exists (e.g. first logged day).
+  const bedtimeForNight = prevLog?.bedtime || log.bedtime;
+  if (log.wake_time && bedtimeForNight) {
     const w = timeToMinutes(log.wake_time);
-    const b = timeToMinutes(log.bedtime);
+    const b = timeToMinutes(bedtimeForNight);
     let night = w - b;
     if (night < 0) night += 1440;
     total += night;
@@ -267,6 +270,12 @@ function formatDate(d) {
     month: "short",
     year: "numeric",
   });
+}
+
+function prevDateStr(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split("T")[0];
 }
 
 function daysRemaining(startDate, length) {
@@ -658,7 +667,8 @@ function ClientApp({ client, onLogout }) {
   }
 
   const log = getLog(selectedDate);
-  const totalSleep = calcTotalSleep(log);
+  const prevLog = getLog(prevDateStr(selectedDate));
+  const totalSleep = calcTotalSleep(log, prevLog);
 
   // Get last 7 days for date picker
   const recentDates = Array.from({ length: 7 }, (_, i) => {
@@ -777,6 +787,9 @@ function ClientApp({ client, onLogout }) {
                   />
                 </div>
               </div>
+              <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#a09890" }}>
+                "Bedtime" here is the bedtime on the night of {formatDate(selectedDate)}, going into the next morning. Today's "Total sleep" uses last night's bedtime (from {formatDate(prevDateStr(selectedDate))}) together with today's wake time above.
+              </p>
             </div>
 
             {/* Naps */}
@@ -1215,7 +1228,7 @@ function ClientDetail({ client, tab, setTab, onReload, settings }) {
     try {
       const [intakeRes, logsRes, notesRes] = await Promise.all([
         db.select("intake_responses", `client_id=eq.${client.id}&select=*`),
-        db.select("sleep_logs", `client_id=eq.${client.id}&order=log_date.desc&limit=14&select=*`),
+        db.select("sleep_logs", `client_id=eq.${client.id}&order=log_date.desc&limit=15&select=*`),
         db.select("coach_notes", `client_id=eq.${client.id}&order=created_at.desc&select=*`),
       ]);
       setIntake(intakeRes?.[0] || null);
@@ -1254,6 +1267,17 @@ function ClientDetail({ client, tab, setTab, onReload, settings }) {
   const progress = client.support_start_date
     ? Math.min(100, (daysSince(client.support_start_date) / client.support_length_days) * 100)
     : 0;
+
+  // Build a lookup so each log can find the previous day's log for overnight sleep math
+  const logsByDate = {};
+  logs.forEach((l) => (logsByDate[l.log_date] = l));
+  function getPrevLog(dateStr) {
+    return logsByDate[prevDateStr(dateStr)];
+  }
+
+  // Only show the most recent 14 in the UI; the 15th (oldest) is fetched purely
+  // to supply prevLog for the 14th-most-recent entry's overnight calculation.
+  const visibleLogs = logs.slice(0, 14);
 
   return (
     <>
@@ -1364,9 +1388,9 @@ function ClientDetail({ client, tab, setTab, onReload, settings }) {
           {/* Last 3 diary entries */}
           <div style={S.card}>
             <p style={S.sectionTitle}>Recent sleep</p>
-            {logs.slice(0, 3).length === 0 && <p style={{ color: "#a09890", fontSize: "14px" }}>No diary entries yet.</p>}
-            {logs.slice(0, 3).map((log) => {
-              const total = calcTotalSleep(log);
+            {visibleLogs.slice(0, 3).length === 0 && <p style={{ color: "#a09890", fontSize: "14px" }}>No diary entries yet.</p>}
+            {visibleLogs.slice(0, 3).map((log) => {
+              const total = calcTotalSleep(log, getPrevLog(log.log_date));
               return (
                 <div key={log.id} style={{ marginBottom: "12px", paddingBottom: "12px", borderBottom: "1px solid #f0ede7" }}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -1389,9 +1413,9 @@ function ClientDetail({ client, tab, setTab, onReload, settings }) {
       {tab === "diary" && (
         <div style={S.card}>
           <p style={S.sectionTitle}>Sleep diary — last 14 entries</p>
-          {logs.length === 0 && <p style={{ color: "#a09890", fontSize: "14px" }}>No diary entries yet.</p>}
-          {logs.map((log) => {
-            const total = calcTotalSleep(log);
+          {visibleLogs.length === 0 && <p style={{ color: "#a09890", fontSize: "14px" }}>No diary entries yet.</p>}
+          {visibleLogs.map((log) => {
+            const total = calcTotalSleep(log, getPrevLog(log.log_date));
             return (
               <div key={log.id} style={{ marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid #f0ede7" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>

@@ -259,8 +259,17 @@ function calcTotalSleep(log, prevLog) {
   return total;
 }
 
+// Local-date helpers that avoid toISOString(), which converts through UTC
+// and shifts the date by a day in timezones ahead of UTC (e.g. Sydney).
+function localDateToStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function today() {
-  return new Date().toISOString().split("T")[0];
+  return localDateToStr(new Date());
 }
 
 function formatDate(d) {
@@ -275,7 +284,7 @@ function formatDate(d) {
 function prevDateStr(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
   d.setDate(d.getDate() - 1);
-  return d.toISOString().split("T")[0];
+  return localDateToStr(d);
 }
 
 function daysRemaining(startDate, length) {
@@ -674,7 +683,7 @@ function ClientApp({ client, onLogout }) {
   const recentDates = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    return d.toISOString().split("T")[0];
+    return localDateToStr(d);
   });
 
   return (
